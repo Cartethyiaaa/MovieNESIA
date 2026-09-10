@@ -1,0 +1,6 @@
+{
+  "appId": "com.movienesia.app",
+  "appName": "MovieNESIA",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

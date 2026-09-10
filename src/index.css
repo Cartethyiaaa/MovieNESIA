@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+* { scrollbar-width: thin; scrollbar-color: #333 transparent; }
+::-webkit-scrollbar { height: 6px; width: 6px; }
+::-webkit-scrollbar-thumb { background:#333; border-radius:999px; }
+.no-scrollbar::-webkit-scrollbar{ display:none; }
+.no-scrollbar{ scrollbar-width:none; -ms-overflow-style:none; }
+.poster-ring{ box-shadow: 0 0 0 2.5px #fff; }
+.glass{ backdrop-filter: blur(8px); }

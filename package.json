@@ -1,0 +1,69 @@
+{
+  "name": "movienesia",
+  "private": true,
+  "version": "1.0.0",
+  "productName": "MovieNESIA",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "electron": "electron .",
+    "electron:dev": "vite build && electron .",
+    "build:win": "vite build && electron-builder --win nsis",
+    "build:linux": "vite build && electron-builder --linux AppImage deb",
+    "build:all": "vite build && electron-builder --win nsis --linux AppImage deb",
+    "cap:init": "npx cap init MovieNESIA com.movienesia.app --web-dir=dist",
+    "cap:add": "npx cap add android",
+    "cap:build": "vite build && npx cap copy && npx cap sync",
+    "cap:open": "npx cap open android"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.23.0"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^6.1.0",
+    "@capacitor/cli": "^6.1.0",
+    "@capacitor/core": "^6.1.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.19",
+    "electron": "^30.5.1",
+    "electron-builder": "^24.9.1",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.4",
+    "vite": "^5.3.3"
+  },
+  "build": {
+    "appId": "com.movienesia.app",
+    "productName": "MovieNESIA",
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "icon": "assets/icon.png",
+      "category": "Video"
+    }
+  },
+  "allowScripts": {
+    "electron@30.5.1": true
+  }
+}
