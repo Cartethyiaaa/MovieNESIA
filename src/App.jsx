@@ -20,7 +20,7 @@ function Shell() {
   const isMovieBox = location.pathname === '/moviebox'
 
   return (
-    <div className={isMovieBox ? 'min-h-screen bg-black text-white' : 'min-h-screen bg-[#0a0b12] text-white pb-24 max-w-md mx-auto'}>
+    <div className={isMovieBox ? 'fixed inset-0 h-[100dvh] w-screen overflow-hidden bg-black text-white' : 'min-h-screen bg-[#0a0b12] text-white pb-24 max-w-md mx-auto'}>
       <Suspense fallback={<Fallback />}>
         <Routes>
           <Route path="/" element={<Home />} />
