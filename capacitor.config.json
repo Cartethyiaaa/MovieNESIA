@@ -1,11 +1,7 @@
 {
-  "appId": "org.movieboxph.desktop",
-  "appName": "MovieBox",
-  "webDir": "www",
-  "server": {
-    "url": "https://movieboxph.org?utm_source=android_app",
-    "cleartext": false
-  },
+  "appId": "com.movienesia.app",
+  "appName": "MovieNESIA",
+  "webDir": "dist",
   "android": {
     "allowMixedContent": false
   }

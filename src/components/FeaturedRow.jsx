@@ -1,5 +1,4 @@
 import React, { memo } from 'react'
-import { backdropUrl, posterUrl } from '../api/tmdb'
 
 function FeaturedCard({ item, onOpen }) {
   const title = item.title || item.name || 'Untitled'

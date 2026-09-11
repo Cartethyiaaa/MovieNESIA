@@ -1,5 +1,4 @@
 import React, { memo } from 'react'
-import { posterUrl } from '../api/tmdb'
 import { HeartIcon, StarIcon } from './icons'
 import { toggleSaved, useIsSaved } from '../store/watchlist'
 

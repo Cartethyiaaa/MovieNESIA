@@ -7,6 +7,7 @@ import BottomNav from './components/BottomNav'
 const Home = lazy(() => import('./pages/Home'))
 const Discover = lazy(() => import('./pages/Discover'))
 const Saved = lazy(() => import('./pages/Saved'))
+const GridPages = lazy(() => import('./pages/GridPages'))
 const Profile = lazy(() => import('./pages/Profile'))
 
 function Fallback() {
@@ -22,6 +23,9 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/discover" element={<Discover />} />
             <Route path="/saved" element={<Saved />} />
+            <Route path="/movies" element={<GridPages.Movies />} />
+            <Route path="/tv" element={<GridPages.TVShows />} />
+            <Route path="/upcoming" element={<GridPages.Upcoming />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="*" element={<Home />} />
           </Routes>

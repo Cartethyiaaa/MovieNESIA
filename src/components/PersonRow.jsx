@@ -1,5 +1,4 @@
 import React, { memo } from 'react'
-import { profileUrl } from '../api/tmdb'
 
 function PersonCard({ person }) {
   const initials = (person.name || '?').split(' ').map(w => w[0]).slice(0, 2).join('')

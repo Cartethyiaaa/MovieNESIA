@@ -1,5 +1,4 @@
 import React from 'react'
-import { backdropUrl } from '../api/tmdb'
 
 function StarRating({ count = 5 }) {
   return (
