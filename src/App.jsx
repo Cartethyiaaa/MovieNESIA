@@ -1,37 +1,48 @@
 import React, { Suspense, lazy } from 'react'
-import { HashRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route, useLocation } from 'react-router-dom'
 import BottomNav from './components/BottomNav'
 
-// Route-level code splitting: the WebView only has to parse the JS for the
-// screen the person is actually on, instead of one big bundle up front.
 const Home = lazy(() => import('./pages/Home'))
 const Discover = lazy(() => import('./pages/Discover'))
 const Saved = lazy(() => import('./pages/Saved'))
-const GridPages = lazy(() => import('./pages/GridPages'))
+const Movies = lazy(() => import('./pages/GridPages').then((m) => ({ default: m.Movies })))
+const TVShows = lazy(() => import('./pages/GridPages').then((m) => ({ default: m.TVShows })))
+const Upcoming = lazy(() => import('./pages/GridPages').then((m) => ({ default: m.Upcoming })))
 const Profile = lazy(() => import('./pages/Profile'))
+const MovieBoxPage = lazy(() => import('./pages/MovieBoxPage'))
 
 function Fallback() {
-  return <div className="min-h-screen grid place-items-center text-white/30 text-sm">Loading…</div>
+  return <div className="min-h-screen grid place-items-center bg-[#0a0b12] text-white/30 text-sm">Loading…</div>
+}
+
+function Shell() {
+  const location = useLocation()
+  const isMovieBox = location.pathname === '/moviebox'
+
+  return (
+    <div className={isMovieBox ? 'min-h-screen bg-black text-white' : 'min-h-screen bg-[#0a0b12] text-white pb-24 max-w-md mx-auto'}>
+      <Suspense fallback={<Fallback />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/discover" element={<Discover />} />
+          <Route path="/saved" element={<Saved />} />
+          <Route path="/movies" element={<Movies />} />
+          <Route path="/tv" element={<TVShows />} />
+          <Route path="/upcoming" element={<Upcoming />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/moviebox" element={<MovieBoxPage />} />
+          <Route path="*" element={<Home />} />
+        </Routes>
+      </Suspense>
+      {!isMovieBox && <BottomNav />}
+    </div>
+  )
 }
 
 export default function App() {
   return (
     <HashRouter>
-      <div className="min-h-screen bg-[#0a0b12] text-white pb-24 max-w-md mx-auto">
-        <Suspense fallback={<Fallback />}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/discover" element={<Discover />} />
-            <Route path="/saved" element={<Saved />} />
-            <Route path="/movies" element={<GridPages.Movies />} />
-            <Route path="/tv" element={<GridPages.TVShows />} />
-            <Route path="/upcoming" element={<GridPages.Upcoming />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="*" element={<Home />} />
-          </Routes>
-        </Suspense>
-        <BottomNav />
-      </div>
+      <Shell />
     </HashRouter>
   )
 }
