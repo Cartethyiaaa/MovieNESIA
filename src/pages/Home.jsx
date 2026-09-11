@@ -1,13 +1,19 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { tmdb, genresForIds } from '../api/tmdb'
-import Hero from '../components/Hero'
+import TopHeader from '../components/TopHeader'
+import CategoryChips from '../components/CategoryChips'
+import SectionHeader from '../components/SectionHeader'
+import FeaturedRow from '../components/FeaturedRow'
 import PosterRow from '../components/PosterRow'
+import PersonRow from '../components/PersonRow'
+import { pushHistory } from '../store/history'
 
 export default function Home() {
-  const [items, setItems] = useState([])
-  const [active, setActive] = useState(null)
-  const [error, setError] = useState('')
+  const [trending, setTrending] = useState([])
+  const [topRated, setTopRated] = useState([])
+  const [people, setPeople] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     let alive = true
@@ -15,18 +21,25 @@ export default function Home() {
       try {
         setLoading(true)
         setError('')
-        let data
-        try { data = await tmdb.trending() } catch { data = await tmdb.popular() }
-        const list = (data.results || []).slice(0, 18)
-        const enriched = await Promise.all(
-          list.map(async (m) => ({
-            ...m,
-            genresList: m.genre_ids?.length ? await genresForIds(m.genre_ids) : [],
-          }))
-        )
+        const [trendRes, topRes, peopleRes] = await Promise.all([
+          tmdb.trending().catch(() => tmdb.popular()),
+          tmdb.topRated(),
+          tmdb.popularPeople(),
+        ])
         if (!alive) return
-        setItems(enriched)
-        setActive(enriched[0] || null)
+
+        const trendList = (trendRes.results || []).slice(0, 10)
+        const topList = (topRes.results || []).slice(0, 12)
+        // Genre lookups are cached after the first call, so this fans out
+        // cheaply instead of one request per poster.
+        const [trendEnriched, topEnriched] = await Promise.all([
+          Promise.all(trendList.map(async (m) => ({ ...m, genresList: m.genre_ids?.length ? await genresForIds(m.genre_ids) : [] }))),
+          Promise.all(topList.map(async (m) => ({ ...m, genresList: m.genre_ids?.length ? await genresForIds(m.genre_ids) : [] }))),
+        ])
+        if (!alive) return
+        setTrending(trendEnriched)
+        setTopRated(topEnriched)
+        setPeople((peopleRes.results || []).slice(0, 8))
       } catch (e) {
         if (!alive) return
         setError(e.message || 'Failed to load TMDB')
@@ -38,30 +51,40 @@ export default function Home() {
     return () => { alive = false }
   }, [])
 
-  function handleSelect(m) {
-    setActive(m)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  function handleBook(movie) {
-    const q = encodeURIComponent(`${movie.title || movie.name} official streaming`)
-    const tmdbUrl = `https://www.themoviedb.org/movie/${movie.id}/watch?locale=US`
-    if (confirm(`Open legal streaming options for "${movie.title || movie.name}"? (TMDB watch providers)\n\nOK = TMDB, Cancel = Google search`)) {
-      window.open(tmdbUrl, '_blank', 'noopener')
-    } else {
-      window.open(`https://www.google.com/search?q=${q}`, '_blank', 'noopener')
-    }
-  }
+  const openTitle = useCallback((item) => {
+    pushHistory(item)
+    const type = item.media_type || (item.first_air_date ? 'tv' : 'movie')
+    window.open(`https://www.themoviedb.org/${type}/${item.id}`, '_blank', 'noopener')
+  }, [])
 
   return (
-    <div className="w-full">
+    <div className="pb-6">
+      <TopHeader />
+
       {error && (
-        <div className="mx-6 md:mx-12 mt-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-200 text-sm">
-          <b>TMDB Error:</b> {error} — add <code className="bg-black/30 px-1.5 py-0.5 rounded">VITE_TMDB_API_KEY</code> to <code>.env</code> (get free at tmdb.org/settings/api) then rebuild.
+        <div className="mx-5 mt-2 mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-200 text-xs">
+          <b>TMDB Error:</b> {error} — add <code className="bg-black/30 px-1 rounded">VITE_TMDB_API_KEY</code> to <code>.env</code> then rebuild.
         </div>
       )}
-      {loading ? <div className="h-[64vh] grid place-items-center text-white/40">Loading trending...</div> : <Hero item={active} onBook={handleBook} />}
-      {!loading && <PosterRow items={items} activeId={active?.id} onSelect={handleSelect} />}
+
+      <div className="flex flex-col gap-7 mt-1">
+        <CategoryChips />
+
+        <section>
+          <SectionHeader title="Trending now" to="/discover?sort=trending" />
+          <FeaturedRow items={trending} onOpen={openTitle} loading={loading} />
+        </section>
+
+        <section>
+          <SectionHeader title="Top rated" to="/discover?sort=top_rated" />
+          <PosterRow items={topRated} onOpen={openTitle} loading={loading} />
+        </section>
+
+        <section>
+          <SectionHeader title="Popular cast" />
+          <PersonRow people={people} loading={loading} />
+        </section>
+      </div>
     </div>
   )
 }

@@ -4,7 +4,7 @@ const path = require('node:path')
 function createWindow(){
   const win = new BrowserWindow({
     width: 1280, height: 800, minWidth: 960, minHeight: 600,
-    backgroundColor: '#0b0e17',
+    backgroundColor: '#0a0b12',
     icon: path.join(__dirname, '../assets/icon.png'),
     autoHideMenuBar: true,
     webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true, spellcheck: false }
