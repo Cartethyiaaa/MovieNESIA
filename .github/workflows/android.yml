@@ -27,6 +27,11 @@ jobs:
       - name: Install deps
         run: npm ci
 
+      - name: Build web app
+        run: npm run build
+        env:
+          VITE_TMDB_API_KEY: ${{ secrets.VITE_TMDB_API_KEY }}
+
       - name: Add Android platform
         run: |
           if [ ! -d android ]; then
